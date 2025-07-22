@@ -1,0 +1,127 @@
+/**
+ * CSS para o plugin Categoria Hierárquica Avançada
+ */
+
+#categoria-hierarquica-container {
+    margin: 10px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.categoria-hierarquica-levels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.categoria-level {
+    min-width: 200px;
+    flex: 1;
+}
+
+.categoria-level label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.categoria-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+.categoria-select:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
+}
+
+.categoria-select:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .categoria-hierarquica-levels {
+        flex-direction: column;
+    }
+    
+    .categoria-level {
+        min-width: auto;
+    }
+}
+
+/* Estilo para Select2 */
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-container .select2-selection--single {
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 34px;
+    padding-left: 12px;
+}
+
+.select2-container .select2-selection--single .select2-selection__arrow {
+    height: 34px;
+    right: 8px;
+}
+
+/* Estilo para o container de configuração */
+.categoria-hierarquica-config {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.categoria-hierarquica-config .tab_cadre_fixe {
+    margin-bottom: 20px;
+}
+
+/* Indicador visual de loading */
+.categoria-select.loading {
+    background-image: url('data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wjRLMlFWCa2z7Q2VJg34hQZWB8Hom0EYqDQHCm7HQVQE9yQoaBMLNYuV2TaaBAAA=');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+/* Estilo para indicar categoria selecionada */
+.categoria-level.selected .categoria-select {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+/* Tooltip para ajuda */
+.categoria-help {
+    display: inline-block;
+    margin-left: 5px;
+    color: #666;
+    cursor: help;
+}
+
+.categoria-help:hover {
+    color: #007cba;
+}
+
+/* Animações suaves */
+.categoria-level {
+    transition: opacity 0.3s ease;
+}
+
+.categoria-level.hidden {
+    opacity: 0.3;
+}

@@ -1,0 +1,65 @@
+# English (United States) translation for Categoria Hierárquica Avançada plugin
+# Copyright (C) 2024
+# This file is distributed under the GPL v2 or later license.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Categoria Hierárquica Avançada 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Categoria Hierárquica Avançada"
+msgstr "Advanced Hierarchical Category"
+
+msgid "Plugin requer GLPI >= %s e < %s"
+msgstr "Plugin requires GLPI >= %s and < %s"
+
+msgid "Nível %d"
+msgstr "Level %d"
+
+msgid "Selecione"
+msgstr "Select"
+
+msgid "Configuração não encontrada"
+msgstr "Configuration not found"
+
+msgid "Configuração do Plugin"
+msgstr "Plugin Configuration"
+
+msgid "Máximo de níveis hierárquicos"
+msgstr "Maximum hierarchical levels"
+
+msgid "Tipos de chamados habilitados"
+msgstr "Enabled ticket types"
+
+msgid "Usar Select2 para seletores"
+msgstr "Use Select2 for selectors"
+
+msgid "Mostrar níveis vazios"
+msgstr "Show empty levels"
+
+msgid "Atualizar"
+msgstr "Update"
+
+msgid "Configuração atualizada com sucesso"
+msgstr "Configuration updated successfully"
+
+msgid "Erro ao atualizar configuração"
+msgstr "Error updating configuration"
+
+msgid "Configuração - Categoria Hierárquica Avançada"
+msgstr "Configuration - Advanced Hierarchical Category"
+
+msgid "Ticket"
+msgstr "Ticket"
+
+msgid "Problem"
+msgstr "Problem"
+
+msgid "Change"
+msgstr "Change"

@@ -1,0 +1,1 @@
+Binary file placeholder - In a real implementation, this would be a compiled .mo file
