@@ -52,6 +52,13 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				glpi: {
+					primary: 'hsl(var(--glpi-primary))',
+					secondary: 'hsl(var(--glpi-secondary))',
+					success: 'hsl(var(--glpi-success))',
+					warning: 'hsl(var(--glpi-warning))',
+					danger: 'hsl(var(--glpi-danger))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
