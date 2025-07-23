@@ -25,12 +25,19 @@ function plugin_categoria_hierarquica_avancada_install() {
     
     $DB->queryOrDie($query, $DB->error());
     
-    // Inserir configuração padrão
-    $config_query = "INSERT INTO `glpi_plugin_categoria_hierarquica_config` 
-        (`max_levels`, `enabled_itemtypes`, `use_select2`, `show_empty_levels`) 
-        VALUES (4, '" . json_encode(['Ticket', 'Problem', 'Change']) . "', 1, 0)";
+    // Verificar se já existe configuração
+    $check_query = "SELECT COUNT(*) as count FROM `glpi_plugin_categoria_hierarquica_config`";
+    $result = $DB->query($check_query);
+    $row = $DB->fetchAssoc($result);
     
-    $DB->queryOrDie($config_query, $DB->error());
+    if ($row['count'] == 0) {
+        // Inserir configuração padrão apenas se não existe
+        $config_query = "INSERT INTO `glpi_plugin_categoria_hierarquica_config` 
+            (`max_levels`, `enabled_itemtypes`, `use_select2`, `show_empty_levels`) 
+            VALUES (4, '" . json_encode(['Ticket', 'Problem', 'Change']) . "', 1, 0)";
+        
+        $DB->queryOrDie($config_query, $DB->error());
+    }
     
     return true;
 }

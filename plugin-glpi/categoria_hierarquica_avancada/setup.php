@@ -25,19 +25,12 @@ function plugin_init_categoria_hierarquica_avancada() {
     $PLUGIN_HOOKS['csrf_compliant']['categoria_hierarquica_avancada'] = true;
     
     // Hook para formulários de chamados
-    $PLUGIN_HOOKS['item_form']['categoria_hierarquica_avancada'] = [
-        'PluginCategoriaHierarquicaAvancadaHook',
-        'itemForm'
-    ];
+    $PLUGIN_HOOKS['post_item_form']['categoria_hierarquica_avancada'] = 'plugin_categoria_hierarquica_post_item_form';
     
     // Hook para adicionar JS/CSS
-    $PLUGIN_HOOKS['add_javascript']['categoria_hierarquica_avancada'] = [
-        'scripts/categoria_hierarquica.js'
-    ];
+    $PLUGIN_HOOKS['add_javascript']['categoria_hierarquica_avancada'] = 'categoria_hierarquica.js';
     
-    $PLUGIN_HOOKS['add_css']['categoria_hierarquica_avancada'] = [
-        'css/categoria_hierarquica.css'
-    ];
+    $PLUGIN_HOOKS['add_css']['categoria_hierarquica_avancada'] = 'categoria_hierarquica.css';
     
     // Menu de configuração
     if (Session::haveRight('config', UPDATE)) {
@@ -97,4 +90,56 @@ function plugin_categoria_hierarquica_avancada_check_prerequisites() {
  */
 function plugin_categoria_hierarquica_avancada_check_config($verbose = false) {
     return true;
+}
+
+/**
+ * Função do hook post_item_form
+ */
+function plugin_categoria_hierarquica_post_item_form($params) {
+    $item = $params['item'];
+    
+    // Verificar se é um tipo de item válido
+    if (!in_array(get_class($item), ['Ticket', 'Problem', 'Change'])) {
+        return;
+    }
+    
+    // Incluir as classes necessárias
+    require_once(Plugin::getPhpDir('categoria_hierarquica_avancada') . '/inc/config.class.php');
+    
+    $config = PluginCategoriaHierarquicaAvancadaConfig::getConfig();
+    
+    if (!$config) {
+        return;
+    }
+    
+    $enabled_types = json_decode($config['enabled_itemtypes'], true);
+    if (!in_array(get_class($item), $enabled_types)) {
+        return;
+    }
+    
+    // Adicionar HTML e JavaScript
+    echo "<script type='text/javascript'>";
+    echo "var categoria_hierarquica_config = " . json_encode($config) . ";";
+    echo "</script>";
+    
+    // HTML do seletor hierárquico
+    echo "<div id='categoria-hierarquica-container' style='display: none;'>";
+    echo "<table class='tab_cadre_fixe'>";
+    echo "<tr class='tab_bg_1'>";
+    echo "<th colspan='2'>" . __('Seleção Hierárquica de Categoria', 'categoria_hierarquica_avancada') . "</th>";
+    echo "</tr>";
+    
+    for ($level = 1; $level <= $config['max_levels']; $level++) {
+        echo "<tr class='tab_bg_1 categoria-level' data-level='{$level}' style='display: none;'>";
+        echo "<td>" . sprintf(__('Nível %d', 'categoria_hierarquica_avancada'), $level) . "</td>";
+        echo "<td>";
+        echo "<select name='categoria_level_{$level}' id='categoria_level_{$level}' class='categoria-select'>";
+        echo "<option value=''>-- " . __('Selecione', 'categoria_hierarquica_avancada') . " --</option>";
+        echo "</select>";
+        echo "</td>";
+        echo "</tr>";
+    }
+    
+    echo "</table>";
+    echo "</div>";
 }
