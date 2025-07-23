@@ -3,16 +3,12 @@
  */
 
 var CategoriaHierarquica = {
-    config: {},
+    currentLevel: 0,
     
     /**
      * Inicializar o plugin
      */
     init: function() {
-        if (typeof categoria_hierarquica_config !== 'undefined') {
-            this.config = categoria_hierarquica_config;
-        }
-        
         this.setupCategorySelector();
         this.bindEvents();
     },
@@ -27,19 +23,8 @@ var CategoriaHierarquica = {
             return;
         }
         
-        // Ocultar seletor original
-        originalSelect.closest('tr').hide();
-        
-        // Mostrar container hierárquico
-        $('#categoria-hierarquica-container').show();
-        
-        // Carregar categorias do primeiro nível
-        this.loadCategories(1, 0);
-        
-        // Configurar Select2 se habilitado
-        if (this.config.use_select2) {
-            this.initializeSelect2();
-        }
+        // Não ocultar o seletor original, apenas modificar seu comportamento
+        console.log('Plugin Categoria Hierárquica Avançada carregado');
     },
     
     /**
@@ -48,37 +33,42 @@ var CategoriaHierarquica = {
     bindEvents: function() {
         var self = this;
         
-        // Evento de mudança nos seletores
-        $(document).on('change', '.categoria-select', function() {
-            var level = parseInt($(this).closest('.categoria-level').data('level'));
+        // Evento de mudança no seletor original
+        $(document).on('change', 'select[name="itilcategories_id"]', function() {
             var selectedValue = $(this).val();
             
-            // Limpar níveis seguintes
-            self.clearNextLevels(level);
+            // Limpar selects filhos
+            self.clearChildSelects();
             
             // Carregar próximo nível se há seleção
             if (selectedValue) {
-                self.loadCategories(level + 1, selectedValue);
-                
-                // Atualizar campo original
-                self.updateOriginalField();
+                self.checkAndLoadChildren(selectedValue, 1, $(this));
             }
+        });
+        
+        // Evento de mudança nos seletores filhos
+        $(document).on('change', '.categoria-child-select', function() {
+            var selectedValue = $(this).val();
+            var level = parseInt($(this).data('level'));
+            
+            // Limpar níveis seguintes
+            self.clearChildSelects(level);
+            
+            // Carregar próximo nível se há seleção
+            if (selectedValue) {
+                self.checkAndLoadChildren(selectedValue, level + 1, $(this));
+            }
+            
+            // Atualizar campo original com a última categoria selecionada
+            self.updateOriginalField();
         });
     },
     
     /**
-     * Carregar categorias para um nível específico
+     * Verificar se tem filhos e carregar se necessário
      */
-    loadCategories: function(level, parentId) {
-        if (level > this.config.max_levels) {
-            return;
-        }
-        
+    checkAndLoadChildren: function(parentId, level, parentElement) {
         var self = this;
-        var selector = $('#categoria_level_' + level);
-        
-        // Mostrar loading
-        selector.html('<option value="">Carregando...</option>');
         
         $.ajax({
             url: CFG_GLPI.root_doc + '/plugins/categoria_hierarquica_avancada/ajax/get_categories.php',
@@ -89,102 +79,78 @@ var CategoriaHierarquica = {
             },
             dataType: 'json',
             success: function(response) {
-                if (response.success) {
-                    self.populateSelector(selector, response.categories, level);
-                } else {
-                    console.error('Erro ao carregar categorias:', response.error);
-                    selector.html('<option value="">Erro ao carregar</option>');
+                if (response.success && response.categories && response.categories.length > 0) {
+                    self.createChildSelector(response.categories, level, parentElement);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Erro AJAX:', error);
-                selector.html('<option value="">Erro ao carregar</option>');
+                console.error('Erro AJAX ao carregar categorias:', error);
             }
         });
     },
     
     /**
-     * Popular um seletor com categorias
+     * Criar um seletor filho
      */
-    populateSelector: function(selector, categories, level) {
-        var html = '<option value="">-- Selecione --</option>';
+    createChildSelector: function(categories, level, parentElement) {
+        // Criar HTML do select
+        var selectHtml = '<select class="form-control categoria-child-select" data-level="' + level + '" style="margin-left: 10px; display: inline-block; width: auto; min-width: 200px;">';
+        selectHtml += '<option value="">-- Selecione uma subcategoria --</option>';
         
         $.each(categories, function(index, category) {
-            html += '<option value="' + category.id + '">' + 
-                   category.name + '</option>';
+            selectHtml += '<option value="' + category.id + '">' + category.name + '</option>';
         });
         
-        selector.html(html);
+        selectHtml += '</select>';
         
-        // Mostrar o seletor
-        selector.closest('.categoria-level').show();
+        // Inserir o select após o elemento pai
+        $(selectHtml).insertAfter(parentElement);
         
-        // Reinicializar Select2 se necessário
-        if (this.config.use_select2) {
-            this.reinitializeSelect2(selector);
-        }
+        // Atualizar nível atual
+        this.currentLevel = level;
     },
     
     /**
-     * Limpar níveis seguintes
+     * Limpar selects filhos a partir de um nível
      */
-    clearNextLevels: function(fromLevel) {
-        for (var i = fromLevel + 1; i <= this.config.max_levels; i++) {
-            var selector = $('#categoria_level_' + i);
-            selector.html('<option value="">-- Selecione --</option>');
-            
-            if (!this.config.show_empty_levels) {
-                selector.closest('.categoria-level').hide();
-            }
+    clearChildSelects: function(fromLevel) {
+        if (typeof fromLevel === 'undefined') {
+            // Limpar todos os selects filhos
+            $('.categoria-child-select').remove();
+            this.currentLevel = 0;
+        } else {
+            // Limpar selects a partir do nível especificado
+            $('.categoria-child-select').each(function() {
+                var selectLevel = parseInt($(this).data('level'));
+                if (selectLevel > fromLevel) {
+                    $(this).remove();
+                }
+            });
+            this.currentLevel = fromLevel;
         }
     },
     
     /**
-     * Atualizar campo original do GLPI
+     * Atualizar campo original do GLPI com a última categoria selecionada
      */
     updateOriginalField: function() {
         var finalCategory = null;
+        var maxLevel = 0;
         
-        // Encontrar a última categoria selecionada
-        for (var i = this.config.max_levels; i >= 1; i--) {
-            var value = $('#categoria_level_' + i).val();
-            if (value) {
+        // Encontrar a categoria selecionada do nível mais alto
+        $('.categoria-child-select').each(function() {
+            var value = $(this).val();
+            var level = parseInt($(this).data('level'));
+            
+            if (value && level > maxLevel) {
                 finalCategory = value;
-                break;
+                maxLevel = level;
             }
-        }
+        });
         
-        // Atualizar campo original
+        // Atualizar campo original com a última categoria selecionada na hierarquia
         if (finalCategory) {
             $('select[name="itilcategories_id"]').val(finalCategory);
-        }
-    },
-    
-    /**
-     * Inicializar Select2
-     */
-    initializeSelect2: function() {
-        if (typeof $.fn.select2 !== 'undefined') {
-            $('.categoria-select').select2({
-                theme: 'bootstrap',
-                width: '100%',
-                placeholder: '-- Selecione --',
-                allowClear: true
-            });
-        }
-    },
-    
-    /**
-     * Reinicializar Select2 em um elemento específico
-     */
-    reinitializeSelect2: function(element) {
-        if (typeof $.fn.select2 !== 'undefined') {
-            element.select2('destroy').select2({
-                theme: 'bootstrap',
-                width: '100%',
-                placeholder: '-- Selecione --',
-                allowClear: true
-            });
         }
     }
 };
